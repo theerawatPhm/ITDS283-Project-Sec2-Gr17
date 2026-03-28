@@ -1,5 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:geolocator/geolocator.dart';
+import 'package:geocoding/geocoding.dart';
 import 'new_order_page.dart';
+import 'find_designer_page.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
 
 class FindStorePage extends StatefulWidget {
   const FindStorePage({super.key});
@@ -27,37 +32,118 @@ class _FindStorePageState extends State<FindStorePage> {
   
   Future<void> _fetchRealLocationAndStores() async{
     setState(() => isLoading = true);
+
+    try {
+      bool serviceEnable = await Geolocator.isLocationServiceEnabled();
+      if(!serviceEnable){
+        throw Exception('Location services are disable.');
+      }
+
+      LocationPermission permission = await Geolocator.checkPermission();
+      if(permission == LocationPermission.denied){
+        permission = await Geolocator.requestPermission();
+        if(permission == LocationPermission.denied){
+          throw Exception('Location permission are denined');
+        }
+      }
+
+      if(permission == LocationPermission.deniedForever){
+        throw Exception('Location permission are permamently denined.');
+      }
+
+      Position position = await Geolocator.getCurrentPosition();
+
+      List<Placemark> placemark = await placemarkFromCoordinates(
+        position.latitude, position.longitude);
+
+      Placemark place = placemark[0];
+      String realLocationName = '${place.subLocality ?? '' } ${place.locality ?? ''}'.trim(); 
+      if(realLocationName.isEmpty) realLocationName = 'Unknown Location';
+
+      setState(() {
+        currentLocation = realLocationName;
+      });
+
+      const String apiKey = 'AIzaSyC_xUpFR7AcEbtyZs2afau3vRws0UX4kKY';
+
+      final double lat = position.latitude;
+      final double lng = position.longitude;
+      final int radius = 5000;
+      final String keyword = '3d printing';
+
+      final String url = 'https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=$lat,$lng&radius=$radius&keyword=$keyword&key=$apiKey';
+
+      final response = await http.get(Uri.parse(url));
+
+      if(response.statusCode == 200){
+        final Map<String, dynamic> data = json.decode(response.body);
+        final List<dynamic> results = data['results'];
+
+        List<Map<String, dynamic>> realStores = [];
+
+        for (var placeData in results){
+          final double storeLat = placeData['geometry']['location']['lat'];
+          final double storeLng = placeData['geometry']['location']['lng'];
+          final double distanceInMeters = Geolocator.distanceBetween(lat, lng, storeLat, storeLng);
+          final String distanceInKm = (distanceInMeters / 1000).toStringAsFixed(1);
+
+          realStores.add({
+            'name' : placeData['name'] ?? 'Unknown Store',
+            'service' : '3D Print Service',
+            'distance' : '$distanceInKm km',
+            'location' : placeData['vicinity'] ?? 'Unknown Address',
+            'color' : Colors.blue.shade300
+          });
+        }
+
+        setState(() {
+          stores = realStores.isNotEmpty ? realStores : [
+            {
+              'name': 'No Real Stores Found Nearby',
+              'service': 'Try expanding search radius',
+              'distance': '- km',
+              'location': 'N/A',
+              'color': Colors.grey.shade400,
+            }
+          ];
+          isLoading = false;
+        });
+      }else{
+        throw Exception('Failed to load places from Google');
+      }
+      //   stores = [
+      //   {
+      //     'name' : 'Amika 3D Print',
+      //     'service' : 'Resin print',
+      //     'distance' : '0.5 km',
+      //     'location' : 'Pinklao',
+      //     'color' : Colors.blue.shade400,
+      //   },
+      //   {
+      //     'name': 'Boom Bim Print',
+      //     'service': 'General and Resin Print',
+      //     'distance': '0.5 km',
+      //     'location': 'Arun Amarin',
+      //     'color': Colors.teal.shade300,
+      //   },
+      //   {
+      //     'name': 'Sophi Kae',
+      //     'service': 'General Print',
+      //     'distance': '0.9 km',
+      //     'location': 'Bangkok Noi',
+      //     'color': Colors.orange.shade300,
+      //   },
+      //   ];
+      //   isLoading = false;
+      // });
+    }catch (e){
+      setState(() {
+        currentLocation = 'Location Error';
+        isLoading = false;
+      });
+      print('Error getting location: $e');
+    }
     await Future.delayed(const Duration(seconds: 2));
-
-    //mock up store
-    setState(() {
-      currentLocation = 'Pinklao';
-
-      stores = [
-        {
-          'name' : 'Amika 3D Print',
-          'service' : 'Resin print',
-          'distance' : '0.5 km',
-          'location' : 'Pinklao',
-          'color' : Colors.blue.shade400,
-        },
-        {
-          'name': 'Boom Bim Print',
-          'service': 'General and Resin Print',
-          'distance': '0.5 km',
-          'location': 'Arun Amarin',
-          'color': Colors.teal.shade300,
-        },
-        {
-          'name': 'Sophi Kae',
-          'service': 'General Print',
-          'distance': '0.9 km',
-          'location': 'Bangkok Noi',
-          'color': Colors.orange.shade300,
-        },
-      ];
-      isLoading = false;
-    });
   }
   @override
   Widget build(BuildContext context) {
@@ -116,19 +202,8 @@ class _FindStorePageState extends State<FindStorePage> {
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 20.0),
             child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text('Near you', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: primaryDark),
-                ),
-                OutlinedButton.icon(
-                  onPressed: (){},
-                  icon: Icon(Icons.filter_alt_outlined, size: 16, color: primaryDark),
-                  label: Text('Filter', style: TextStyle(color: primaryDark, fontSize: 12)),
-                  style: OutlinedButton.styleFrom(
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-                    side: BorderSide(color: primaryDark),
-                    padding: const EdgeInsets.symmetric(horizontal: 15),
-                  ),
                 ),
               ],
             ),
@@ -182,15 +257,8 @@ class _FindStorePageState extends State<FindStorePage> {
                   const SizedBox(height: 4,),
                   Text(store['service'], style: TextStyle(color: primaryDark, fontSize: 14)),
                   Text(store['distance'], style: TextStyle(color: primaryDark, fontSize: 14)),
+                  Text(store['location'],style: TextStyle(color: primaryDark, fontSize: 14)),
                   const SizedBox(height: 8,),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text(store['location'],style: TextStyle(color: primaryDark, fontSize: 14)),
-                      Text('More detail>', style: TextStyle(color: primaryDark, fontSize: 14))
-
-                    ],
-                  )
                 ],
               ))
           ],
@@ -306,7 +374,7 @@ class StoreDetailPage extends StatelessWidget {
     //alert dialog
     void _showOrderAlert(BuildContext context, Color primaryOrange, Color primaryDark){
       showDialog(context: context,
-      builder: (BuildContext context){
+      builder: (BuildContext dialogContext){
         return AlertDialog(
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
           contentPadding: const EdgeInsets.all(32),
@@ -322,6 +390,7 @@ class StoreDetailPage extends StatelessWidget {
                 width: double.infinity,
                 child: OutlinedButton(onPressed: (){
                   Navigator.pop(context);
+                  Navigator.push(context, MaterialPageRoute(builder: (context) => const FindDesignerPage()));
                 },
                 style: OutlinedButton.styleFrom(
                   side: BorderSide(color: primaryOrange),
@@ -337,7 +406,7 @@ class StoreDetailPage extends StatelessWidget {
                 width: double.infinity,
                 child: ElevatedButton(
                   onPressed: (){
-                    Navigator.pop(context);
+                    Navigator.pop(dialogContext);
                     Navigator.push(context, MaterialPageRoute(builder: (context) => const NewDesign()));
                 },
                 style: ElevatedButton.styleFrom(
@@ -349,7 +418,7 @@ class StoreDetailPage extends StatelessWidget {
               ),
               const SizedBox(height: 16,),
               GestureDetector(
-                onTap: ()=> Navigator.pop(context),
+                onTap: ()=> Navigator.pop(dialogContext),
                 child: Text('Back to find store', style: TextStyle(color: Colors.grey.shade400, fontSize: 12),),
               )
             ],

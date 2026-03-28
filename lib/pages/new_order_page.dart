@@ -1,7 +1,11 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart';
+import 'package:file_picker/file_picker.dart';
 
 class NewDesign extends StatefulWidget {
-  const NewDesign({super.key});
+  final VoidCallback? onBackToHome;
+  const NewDesign({super.key, this.onBackToHome});
 
   @override
   State<NewDesign> createState() => _NewDesignState();
@@ -23,6 +27,18 @@ class _NewDesignState extends State<NewDesign> {
   String  _SelectedColor = 'Filament Color';
   String  _selectedRequestFile = 'No';
 
+  Future<void> _pickFile() async{
+    FilePickerResult? result = await FilePicker.platform.pickFiles(
+      type: FileType.custom,
+      allowedExtensions: ['stl', 'obj', 'gcode'],
+    );
+    if(result != null){
+      setState(() {
+        _selectedFileName = result.files.single.name;
+      });
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -39,12 +55,20 @@ class _NewDesignState extends State<NewDesign> {
                 child: Stack(
                   alignment: Alignment.center,
                   children: [
-                    Text('Import Deign', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: primaryDark),
+                    Text('Import Design', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: primaryDark),
                     ),
                     Positioned(
                       left: 0,
-                      child: IconButton(onPressed: () => Navigator.pop(context),
-                      icon: Icon(Icons.arrow_back, color: primaryDark, size: 28,)))
+                      child: IconButton(
+                        onPressed: () {
+                          if(Navigator.canPop(context)){
+                            Navigator.pop(context);
+                          }else if(widget.onBackToHome != null){
+                            widget.onBackToHome!();
+                          }
+                        },
+                        icon: Icon(Icons.arrow_back, size: 28, color: primaryDark),
+                      ),),
                   ],
                 ),
               ),
@@ -73,13 +97,27 @@ class _NewDesignState extends State<NewDesign> {
                   const SizedBox(width: 12,),
                   ElevatedButton(
                     onPressed: (){
+                      if(_selectedFileName == null){
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(content: Text('Please upload 3D file first')));
+                          return;
+                      }
 
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(content: Text('Order Submitted Successfully'),
+                        backgroundColor: Colors.green,));
+
+                        if(Navigator.canPop(context)){
+                          Navigator.pop(context);
+                        }else if(widget.onBackToHome != null){
+                          widget.onBackToHome!();
+                        }
                     },
                     style: ElevatedButton.styleFrom(
                       backgroundColor: primaryOrange,
                       foregroundColor: Colors.white,
                       shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadiusGeometry.circular(20),
+                        borderRadius: BorderRadius.circular(20),
                       ),
                       padding: const EdgeInsets.symmetric(horizontal: 24),
                       elevation: 0,
@@ -146,7 +184,7 @@ class _NewDesignState extends State<NewDesign> {
   Widget _buildUploadBox(){
     return GestureDetector(
       onTap: () {
-        print("Tapped Upload Box");
+        _pickFile();
       },
       child: Container(
         width: double.infinity,

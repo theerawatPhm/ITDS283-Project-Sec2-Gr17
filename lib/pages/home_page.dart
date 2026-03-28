@@ -25,7 +25,11 @@ class _HomePageState extends State<HomePage> {
   Widget build(BuildContext context) {
     final List<Widget> pages = [
       _buildHomeContent(),
-      const NewDesign(),
+      NewDesign(onBackToHome: (){
+        setState(() {
+          _selectedIndex = 0;
+        });
+      }),
       const OrderPage(),
     ];
     return Scaffold(
