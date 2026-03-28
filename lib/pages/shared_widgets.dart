@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 
 final Color primaryDark = const Color(0xFF4A3B52);
 final Color primaryOrange = const Color.fromARGB(232, 202, 86, 44);
@@ -119,8 +118,7 @@ class ProcessingBanner extends StatelessWidget {
           Expanded(
             flex: 1,
             child: Center(
-              child: SvgPicture.asset('assets/icons/constructionTwo.svg',
-              colorFilter: const ColorFilter.mode(Colors.white, BlendMode.srcIn,),
+              child: Image.asset('assets/icons/constructionTwo.png',
               width: 80,
               height: 80,
               ),

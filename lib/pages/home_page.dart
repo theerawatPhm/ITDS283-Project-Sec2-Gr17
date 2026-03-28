@@ -1,9 +1,10 @@
-import 'package:app_3d_now/pages/find_store_page.dart';
-import 'package:app_3d_now/pages/order_page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+
+import 'order_page.dart';
 import 'new_order_page.dart';
 import 'shared_widgets.dart';
+import 'find_store_page.dart';
 import 'find_designer_page.dart';
 
 class HomePage extends StatefulWidget {
@@ -201,15 +202,18 @@ Widget _buildServicesList() {
     return SingleChildScrollView(
       scrollDirection: Axis.horizontal,
       child: Row(
-        children: services.map((service) {
+        children: services.map((services) {
           return Padding(
             padding: const EdgeInsets.only(right: 12.0),
             child: GestureDetector(
               onTap: () {
-                if (service == 'Find Designer'){
+
+                print('On tap test ${services}');
+                if (services == 'Find Designer'){
                   Navigator.push(context, MaterialPageRoute(builder: (context) => const FindDesignerPage()));
-                }else if(service == 'Find Store'){
-                  Navigator.push(context, MaterialPageRoute(builder: (context) => const FindStorePage()));
+                }else if(services == 'Print Stores'){
+                  Navigator.push(context, MaterialPageRoute(builder: (context) => const FindStorePage())
+                  );
                 }
               },
               child: Container(
@@ -220,7 +224,7 @@ Widget _buildServicesList() {
                 border: Border.all(color: primaryDark, width: 1),
               ),
               child: Text(
-                service,
+                services,
                 style: TextStyle(
                   color: primaryDark,
                   fontSize: 20,
