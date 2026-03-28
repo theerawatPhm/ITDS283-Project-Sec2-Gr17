@@ -64,7 +64,7 @@ class _FindStorePageState extends State<FindStorePage> {
         currentLocation = realLocationName;
       });
 
-      const String apiKey = 'AIzaSyC_xUpFR7AcEbtyZs2afau3vRws0UX4kKY';
+      const String apiKey = '';
 
       final double lat = position.latitude;
       final double lng = position.longitude;
