@@ -28,7 +28,7 @@ class ReviewOrderPage extends StatelessWidget {
     return Scaffold(
       backgroundColor: bgColor,
       body: SafeArea(
-        child: Column(
+        child: Column( 
           children: [
             Padding(padding: const EdgeInsets.symmetric(horizontal: 24.0 ,vertical: 16.0),
             child: SizedBox(

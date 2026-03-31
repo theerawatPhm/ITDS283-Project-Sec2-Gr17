@@ -211,7 +211,7 @@ class _NewDesignState extends State<NewDesign> {
 
             Column(
               mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.start,
+              crossAxisAlignment: CrossAxisAlignment.center,
               children: [
                 Text(
                 _selectedFileName ?? 'Import 3D Files\n Here',
@@ -223,7 +223,7 @@ class _NewDesignState extends State<NewDesign> {
               ),
             ),
             const SizedBox(height: 8,),
-            const Text('(.stl and .obj file are allowed)', style: TextStyle(color: Colors.grey, fontSize: 12),)
+            const Text('(.stl, .obj and .gcode file are allowed)', style: TextStyle(color: Colors.grey, fontSize: 12),)
           ],
         )
           ],

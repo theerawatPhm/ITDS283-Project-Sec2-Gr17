@@ -225,7 +225,7 @@ Widget _buildHomeContent() {
 
   //WIDGET HERE
 Widget _buildServicesList() {
-    final services = ['Print Stores', 'Find Designer', 'Marketplace', 'Order'];
+    final services = ['Print Stores', 'Find Designer', 'Marketplace',];
     return SingleChildScrollView(
       scrollDirection: Axis.horizontal,
       child: Row(
@@ -239,10 +239,8 @@ Widget _buildServicesList() {
                 if (services == 'Find Designer'){
                   Navigator.push(context, MaterialPageRoute(builder: (context) => const FindDesignerPage()));
                 }else if(services == 'Print Stores'){
-                  Navigator.push(context, MaterialPageRoute(builder: (context) => const FindStorePage())
-                  );
-                }
-              },
+                  Navigator.push(context, MaterialPageRoute(builder: (context) => const FindStorePage()));}
+                  },
               child: Container(
               padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
               decoration: BoxDecoration(
@@ -275,10 +273,10 @@ Widget _buildServicesList() {
             title: 'New arrival, Medical model',
             tag: 'NEW',
             date: '2 days ago',
-            icon: Icons.biotech,
+            imagePath: 'assets/img/forceps7.jpg'
           ),
           const SizedBox(width: 16,),
-          _buildNewCard(title: 'Orange model has release', tag: '', date: '2 days ago', icon: Icons.eco),
+          _buildNewCard(title: 'Orange model has release', tag: '', date: '2 days ago', imagePath: 'assets/img/forceps7.jpg'),
         ],
       ),
     );
@@ -288,7 +286,7 @@ Widget _buildServicesList() {
     required String title,
     required String tag,
     required String date,
-    required IconData icon,
+    required String imagePath,
   }){
     return Container(
       width: 180,
@@ -303,6 +301,9 @@ Widget _buildServicesList() {
         children: [
           Stack(
             children: [
+              ClipRRect(
+                borderRadius: BorderRadius.circular(16),
+              ),
               Container(
                 height: 120,
                 width: double.infinity,
@@ -310,7 +311,7 @@ Widget _buildServicesList() {
                   color: Colors.grey.shade50,
                   borderRadius: BorderRadius.circular(16),
                 ),
-                child: Icon(icon, size: 60, color: Colors.grey,),
+                child: Image.asset(imagePath, fit: BoxFit.cover,),
               ),
               if(tag.isNotEmpty)
                 Positioned(
@@ -354,7 +355,7 @@ Widget _buildServicesList() {
               date,
               style: const TextStyle(fontSize: 10, color: Colors.grey),
             ),
-          )
+          ),
         ],
       ),
     );
