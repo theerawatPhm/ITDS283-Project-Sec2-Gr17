@@ -1,7 +1,9 @@
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:flutter/material.dart';
 
 import 'pages/home_page.dart';
-import 'package:flutter/material.dart';
+import 'pages/login_page.dart';
+
 
 Future <void> main() async {
 
@@ -25,7 +27,7 @@ class MyApp extends StatelessWidget {
         scaffoldBackgroundColor: const Color(0xFFF8F8F8), 
       ),
       
-      home: const HomePage(), 
+      home: const LoginPage(), 
     );
   }
 }
