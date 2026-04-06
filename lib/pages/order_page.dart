@@ -19,6 +19,65 @@ class _OrderPageState extends State<OrderPage> {
   final Color bgColor = const Color(0xFFF8F8F8);
   final Color successGreen = const Color(0xFF4CAF50);
 
+  //function Complete Order
+  Future<void> _completeOrder(String docId) async{
+    try{
+      await FirebaseFirestore.instance.collection('app3dnow_order').doc(docId).update({
+        'status' : 'Complete',
+      });
+      if(mounted){
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Order marked as Complete!')));
+      }
+    }catch(e){
+      if(mounted){
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Error $e')));
+      }
+    }
+  }
+
+  //function cancel and delete order
+  Future<void> _cancelOrder(String docId) async{
+    try{
+      await FirebaseFirestore.instance.collection('app3dnow_order').doc(docId).delete();
+      if(mounted){
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Order canceled successfully')));
+      }
+    }catch(e){
+      if(mounted){
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Error $e')));
+      }
+    }
+  }
+
+  //pop up ก่อนกด Cancel Make sure ก่อน
+ void _showCancelDialog(BuildContext context, String docId) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+        title: Text('Cancel Order?', style: TextStyle(color: primaryDark, fontWeight: FontWeight.bold)),
+        content: const Text('Are you sure you want to cancel this order? This action cannot be undone.'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('No, keep it', style: TextStyle(color: Colors.grey)),
+          ),
+          ElevatedButton(
+            onPressed: () {
+              _cancelOrder(docId);
+              Navigator.pop(context);
+            },
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.red.shade400,
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+            ),
+            child: const Text('Yes, Cancel', style: TextStyle(color: Colors.white)),
+          ),
+        ],
+      ),
+    );
+  }
+
   // final List<Map<String, dynamic>> allOrder =[{
 
   //   'status': 'Processing',
