@@ -53,6 +53,7 @@ class _OrderPageState extends State<OrderPage> {
       context: context,
       builder: (context) => AlertDialog(
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+        backgroundColor: Colors.white,
         title: Text('Cancel Order?', style: TextStyle(color: primaryDark, fontWeight: FontWeight.bold)),
         content: const Text('Are you sure you want to cancel this order? This action cannot be undone.'),
         actions: [

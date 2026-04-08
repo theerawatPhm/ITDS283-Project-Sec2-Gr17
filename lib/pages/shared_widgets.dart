@@ -71,7 +71,7 @@ class ProcessingBanner extends StatelessWidget {
           Expanded(
             flex: 2,
             child: Text(
-              '$orderCount order${orderCount > 1 ? 's' : ''} processing', 
+              '$orderCount order${orderCount > 1 ? 's are' : ' is'} processing', 
               style: const TextStyle(
                 color: Colors.white, 
                 fontSize: 18, 
@@ -84,7 +84,7 @@ class ProcessingBanner extends StatelessWidget {
             flex: 1,
             child: Center(
               child: Image.asset(
-                'assets/icons/constructionTwo.png',
+                'assets/icons/construction3.png',
                 width: 80,
                 height: 80,
               ),
