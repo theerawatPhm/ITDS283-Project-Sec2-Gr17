@@ -152,9 +152,7 @@ class _MarketplacePageState extends State<MarketplacePage> {
           ),
           const SizedBox(height: 10),
 
-          // ----------------------------------------------------
           // Grid แสดงรายการสินค้า
-          // ----------------------------------------------------
           Expanded(
             child: GridView.builder(
               padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 10.0),
@@ -249,9 +247,7 @@ class _MarketplacePageState extends State<MarketplacePage> {
   }
 }
 
-// =========================================================================
 // หน้า Preview Model (productToPurchase) เด้งขึ้นมาเมื่อกดเลือกโมเดล
-// =========================================================================
 
 class ModelPreviewPage extends StatelessWidget {
   final Map<String, dynamic> modelData;
