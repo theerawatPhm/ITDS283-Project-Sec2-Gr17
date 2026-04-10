@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-// อย่าลืม import หน้า find_store_page มาเพื่อลิงก์ไปหานะครับ
+
 import 'find_store_page.dart'; 
 
 class MarketplacePage extends StatefulWidget {
@@ -160,7 +160,7 @@ class _MarketplacePageState extends State<MarketplacePage> {
                             ),
                           ),
                         ),
-                        // รายละเอียดด้านล่าง
+                        // รายละเอียด
                         Padding(
                           padding: const EdgeInsets.all(12.0),
                           child: Column(
@@ -191,7 +191,7 @@ class _MarketplacePageState extends State<MarketplacePage> {
             ),
           ),
           
-          // ตัวเลขบอกจำนวน Items (จำลอง)
+          
           Padding(
             padding: const EdgeInsets.all(16.0),
             child: Text(
@@ -206,7 +206,7 @@ class _MarketplacePageState extends State<MarketplacePage> {
 }
 
 // =========================================================================
-// หน้า Preview Model (productToPurches) จะเด้งขึ้นมาเมื่อกดเลือกโมเดลใน Grid
+// หน้า Preview Model (productToPurchase) เด้งขึ้นมาเมื่อกดเลือกโมเดล
 // =========================================================================
 
 class ModelPreviewPage extends StatelessWidget {
@@ -264,11 +264,11 @@ class ModelPreviewPage extends StatelessWidget {
                   ),
                   const SizedBox(height: 30),
                   
-                  // หัวข้อ Model Order Details
+
                   Text('Model Order Details', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: primaryDark)),
                   const SizedBox(height: 16),
                   
-                  // ข้อมูล (ดึงค่า Material มาจากที่เลือก ส่วนอื่นจำลองไว้ก่อน)
+
                   _buildDetailRow('Material:', modelData['material'], primaryDark),
                   _buildDetailRow('Quality:', 'Mid', primaryDark),
                   _buildDetailRow('Scrub:', 'No', primaryDark),
