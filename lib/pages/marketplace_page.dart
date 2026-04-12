@@ -15,6 +15,9 @@ class _MarketplacePageState extends State<MarketplacePage> {
 
   bool isModelSelected = true;
 
+  final TextEditingController _searchController = TextEditingController();
+  List<Map<String, dynamic>> displayModels = [];
+
   // mock data
   final List<Map<String, dynamic>> mockModels = [
     {
@@ -62,6 +65,24 @@ class _MarketplacePageState extends State<MarketplacePage> {
   ];
 
   @override
+  void initState(){
+    super.initState();
+    displayModels = List.from(mockModels);
+  }
+
+  void _runsearch(String enteredKeyword){
+    List<Map<String, dynamic>> results = [];
+    if(enteredKeyword.isEmpty){
+      results = List.from(mockModels);
+    }else{
+      results = mockModels.where((model) => model['title'].toString().toLowerCase().contains(enteredKeyword.toLowerCase())).toList();
+    }
+    setState(() {
+      displayModels = results;
+    });
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: bgColor,
@@ -80,12 +101,10 @@ class _MarketplacePageState extends State<MarketplacePage> {
       ),
       body: Column(
         children: [
-          
-          // แถบ Toggle
+          // 🔴 1. โครงสร้าง Search Bar ที่ถูกต้อง (มี Row ครอบ และ Expanded ดันปุ่ม)
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 8.0),
             child: Container(
-              height: 45,
               decoration: BoxDecoration(
                 color: Colors.white,
                 borderRadius: BorderRadius.circular(30),
@@ -93,56 +112,32 @@ class _MarketplacePageState extends State<MarketplacePage> {
               ),
               child: Row(
                 children: [
-                  
                   Expanded(
-                    child: GestureDetector(
-                      onTap: () {
-                        setState(() {
-                          isModelSelected = true;
-                        });
-                      },
-                      child: Container(
-                        decoration: BoxDecoration(
-                          color: isModelSelected ? primaryOrange : Colors.transparent,
-                          borderRadius: BorderRadius.circular(30),
-                        ),
-                        child: Center(
-                          child: Text(
-                            'Model',
-                            style: TextStyle(
-                              color: isModelSelected ? Colors.white : primaryOrange,
-                              fontWeight: FontWeight.bold,
-                              fontSize: 16,
-                            ),
-                          ),
-                        ),
+                    child: TextField(
+                      controller: _searchController,
+                      onChanged: (value) => _runsearch(value),
+                      decoration: InputDecoration(
+                        hintText: 'Search for models...',
+                        hintStyle: TextStyle(color: Colors.grey.shade500, fontSize: 16,),
+                        prefixIcon: Icon(Icons.search, color: primaryOrange,),
+                        border: InputBorder.none,
+                        contentPadding: const EdgeInsets.symmetric(vertical: 12),
                       ),
                     ),
                   ),
-                  
-                  
-                  Expanded(
-                    child: GestureDetector(
-                      onTap: () {
-                        setState(() {
-                          isModelSelected = false;
-                        });
-                      },
-                      child: Container(
-                        decoration: BoxDecoration(
-                          color: !isModelSelected ? primaryOrange : Colors.transparent,
-                          borderRadius: BorderRadius.circular(30),
-                        ),
-                        child: Center(
-                          child: Text(
-                            'Select',
-                            style: TextStyle(
-                              color: !isModelSelected ? Colors.white : primaryOrange,
-                              fontWeight: FontWeight.bold,
-                              fontSize: 16,
-                            ),
-                          ),
-                        ),
+                  Padding(
+                    padding: const EdgeInsets.all(4.0),
+                    child: ElevatedButton(
+                      onPressed: () => _runsearch(_searchController.text),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: primaryOrange,
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
+                        elevation: 0,
+                        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                      ),
+                      child: const Text(
+                        'Search',
+                        style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
                       ),
                     ),
                   ),
@@ -151,6 +146,7 @@ class _MarketplacePageState extends State<MarketplacePage> {
             ),
           ),
           const SizedBox(height: 10),
+          // แถบ Toggle
 
           // Grid แสดงรายการสินค้า
           Expanded(
