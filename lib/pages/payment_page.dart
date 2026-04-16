@@ -60,6 +60,21 @@ class _PaymentPageState extends State<PaymentPage> {
 
 @override
   Widget build(BuildContext context) {
+    // 1. ดึงข้อมูลที่เช็กไว้ในหน้า Review มาใช้ว่าอันนี้สั่งกับ Designer ไหม
+    bool hasDesigner = widget.orderDetails['designerDescription'] != null && widget.orderDetails['designerDescription'].toString().isNotEmpty;
+    
+    // 2. ถ้าเป็น Designer ก็ดึงชื่อจากคำสั่งจ้างมาโชว์ ถ้าไม่ใช่ก็โชว์ '-'
+    String designerName = '-';
+    if (hasDesigner) {
+       // แงะชื่อออกมาจากคำว่า "Hire: ชื่อคน" ถ้าพิมพ์มาตรงๆ ก็จะดึงคำนั้นมาเลย
+       String desc = widget.orderDetails['designerDescription'];
+       if (desc.startsWith('Hire: ')) {
+         designerName = desc.substring(6); // ตัดคำว่า "Hire: " ออก
+       } else {
+         designerName = 'Custom Request'; // ถ้าพราวพิมพ์ข้อมูลเองในช่อง Describe
+       }
+    }
+
     return Scaffold(
       backgroundColor: Colors.white,
       body: SafeArea(
@@ -86,7 +101,8 @@ class _PaymentPageState extends State<PaymentPage> {
 
                     _buildSummaryRow('Total', '฿${widget.totalAmount.toStringAsFixed(1)}\n(vat include)', isTotal: true),
                     const SizedBox(height: 16),
-                    _buildSummaryRow('Designer', 'Amika Yeti'),
+                    // 3. เอาตัวแปรชื่อ Designer มาโชว์แทน Amika Yeti
+                    _buildSummaryRow('Designer', designerName),
                     const SizedBox(height: 8),
                     _buildSummaryRow('Store', '-'),
                     const SizedBox(height: 32),
