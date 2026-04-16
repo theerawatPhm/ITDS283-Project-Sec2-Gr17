@@ -60,6 +60,21 @@ class _PaymentPageState extends State<PaymentPage> {
 
 @override
   Widget build(BuildContext context) {
+    
+    bool hasDesigner = widget.orderDetails['designerDescription'] != null && widget.orderDetails['designerDescription'].toString().isNotEmpty;
+    
+    
+    String designerName = '-';
+    if (hasDesigner) {
+       
+       String desc = widget.orderDetails['designerDescription'];
+       if (desc.startsWith('Hire: ')) {
+         designerName = desc.substring(6);
+       } else {
+         designerName = 'Custom Request';
+       }
+    }
+
     return Scaffold(
       backgroundColor: Colors.white,
       body: SafeArea(
@@ -86,7 +101,8 @@ class _PaymentPageState extends State<PaymentPage> {
 
                     _buildSummaryRow('Total', '฿${widget.totalAmount.toStringAsFixed(1)}\n(vat include)', isTotal: true),
                     const SizedBox(height: 16),
-                    _buildSummaryRow('Designer', 'Amika Yeti'),
+                    
+                    _buildSummaryRow('Designer', designerName),
                     const SizedBox(height: 8),
                     _buildSummaryRow('Store', '-'),
                     const SizedBox(height: 32),
