@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'review_order_page.dart';
 
 class FindDesignerPage extends StatefulWidget {
   const FindDesignerPage({super.key});
@@ -14,14 +15,14 @@ class _FindDesignerPageState extends State<FindDesignerPage> {
 
   final List<Map<String, dynamic>> mockDesigners = [
     {
-      'name': 'Tee',
+      'name': 'Theerawat',
       'specialty': 'Mechanical & Hard Surface Expert',
       'rating': '4.9 (150 reviews)',
       'price': 'Starts at ฿500',
       'image': 'assets/img/designer_1.jpg', 
     },
     {
-      'name': 'Prw S.',
+      'name': 'Proudrawee',
       'specialty': 'Character & Organic Sculpting',
       'rating': '4.8 (92 reviews)',
       'price': 'Starts at ฿850',
@@ -281,7 +282,24 @@ class DesignerProfilePage extends StatelessWidget {
               width: double.infinity,
               height: 50,
               child: ElevatedButton(
-                onPressed: () {},
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => ReviewOrderPage(
+                        
+                        fileName: 'Hire: ${designerData['name']}',
+                        fileSize: '-',
+                        material: 'Discuss with designer',
+                        quality: 'High',
+                        scrub: 'No',
+                        color: '-',
+                        requestFile: 'Yes',
+                        otherText: 'Starting Price: ${designerData['price']}',
+                      ),
+                    ),
+                  );
+                },
                 style: ElevatedButton.styleFrom(
                   backgroundColor: primaryOrange,
                   shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(25)),
