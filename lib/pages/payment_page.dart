@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'home_page.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class PaymentPage extends StatefulWidget {
 
@@ -47,7 +48,7 @@ class _PaymentPageState extends State<PaymentPage> {
       if (!mounted) return; 
       setState(() => _isLoading = false);
 
-      Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => const SuccessPage()));
+      Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => SuccessPage(orderDetails: finalOrderData)));
       
     }catch (e){
       setState(() => _isLoading = false);
@@ -199,12 +200,28 @@ class _PaymentPageState extends State<PaymentPage> {
 }
 
 class SuccessPage extends StatelessWidget {
-  const SuccessPage({super.key});
+  final Map<String, dynamic>? orderDetails;
+  const SuccessPage({super.key, this.orderDetails});
+
+  Future<void> _downloadFile(BuildContext context, String? url) async {
+    if (url == null || url.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('No file link available.')));
+      return;
+    }
+    final Uri uri = Uri.parse(url);
+    if (await canLaunchUrl(uri)) {
+      await launchUrl(uri, mode: LaunchMode.externalApplication);
+    } else {
+      if (context.mounted) ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Could not start download.')));
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
     final Color primaryDark = const Color(0xFF4A3B52);
     final Color primaryOrange = const Color.fromARGB(232, 202, 86, 44);
+
+    bool isDownloadOrder = orderDetails?['orderType'] == 'download';
 
     return Scaffold(
       backgroundColor: Colors.white,
@@ -240,6 +257,23 @@ class SuccessPage extends StatelessWidget {
               ),
               
               const Spacer(),
+
+              if (isDownloadOrder) ...[
+                SizedBox(
+                  width: double.infinity,
+                  child: ElevatedButton.icon(
+                    onPressed: () => _downloadFile(context, orderDetails?['fileUrl']),
+                    icon: const Icon(Icons.file_download, color: Colors.white),
+                    label: const Text('Download Model Now', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.white)),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.green,
+                      padding: const EdgeInsets.symmetric(vertical: 16),
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 12),
+              ],
               
               SizedBox(
                 width: double.infinity,

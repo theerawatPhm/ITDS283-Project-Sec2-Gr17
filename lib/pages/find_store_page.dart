@@ -6,9 +6,11 @@ import 'find_designer_page.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'payment_page.dart';
 
 class FindStorePage extends StatefulWidget {
-  const FindStorePage({super.key});
+  final Map<String, dynamic>? modelData;
+  const FindStorePage({super.key, this.modelData});
 
   @override
   State<FindStorePage> createState() => _FindStorePageState();
@@ -227,7 +229,7 @@ class _FindStorePageState extends State<FindStorePage> {
   Widget _buildStoreCard(Map<String, dynamic> store){
     return GestureDetector(
       onTap: () {
-        Navigator.push(context, MaterialPageRoute(builder: (context) => StoreDetailPage(StoreData: store)),
+        Navigator.push(context, MaterialPageRoute(builder: (context) => StoreDetailPage(StoreData: store, modelData: widget.modelData)),
         );
       },
       child: Container(
@@ -272,7 +274,8 @@ class _FindStorePageState extends State<FindStorePage> {
 class StoreDetailPage extends StatelessWidget {
 
   final Map<String, dynamic> StoreData;
-  const StoreDetailPage({super.key, required this.StoreData});
+  final Map<String, dynamic>? modelData;
+  const StoreDetailPage({super.key, required this.StoreData,this.modelData});
 
   @override
   Widget build(BuildContext context) {
@@ -341,17 +344,35 @@ class StoreDetailPage extends StatelessWidget {
 
                           SizedBox(
                             width: double.infinity,
-                            child: ElevatedButton(onPressed: (){
-                              _showOrderAlert(context, primaryOrange, primaryDark);
-                            },
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: primaryOrange,
-                              padding: const EdgeInsets.symmetric(vertical: 16),
-                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
-                            ), child: const Text('Order Now', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.white),)),
-                          )
+                            child: ElevatedButton(
+                              onPressed: () {
+                                if (modelData != null) {
+                                  //ถ้ามี Order แล้ววิ่งเข้า Payment เลย
+                                  Navigator.push(context, MaterialPageRoute(builder: (context) => PaymentPage(
+                                    totalAmount: (modelData!['price'] ?? 0).toDouble() + 5.99,
+                                    orderDetails: {
+                                      'modelId': modelData!['id'] ?? '',
+                                      'title': modelData!['title'] ?? '3D Model',
+                                      'storeName': StoreData['name'],
+                                      'orderType': 'print_at_store',
+                                      'designerDescription': '',
+                                    }
+                                  )));
+                                } else {
+                                  _showOrderAlert(context, primaryOrange, primaryDark);
+                                }
+                              },
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: primaryOrange,
+                                padding: const EdgeInsets.symmetric(vertical: 16),
+                                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
+                              ),
+                              child: const Text('Order Now', style: TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold)),
+                            ),
+                          ),
                         ],
-                      ),)
+                      ),
+                    )
                   ],
                 ),
               )

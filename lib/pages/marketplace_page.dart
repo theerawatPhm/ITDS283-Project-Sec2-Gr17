@@ -1,5 +1,6 @@
 import 'package:app_3d_now/pages/add_model_page.dart';
 import 'package:app_3d_now/pages/my_model_page.dart';
+import 'package:app_3d_now/pages/payment_page.dart';
 import 'package:flutter/material.dart';
 import 'find_store_page.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -261,6 +262,77 @@ class ModelPreviewPage extends StatelessWidget {
 
   const ModelPreviewPage({super.key, required this.modelData});
 
+  void _ShowOrderOptionsDialog(BuildContext context, Map<String, dynamic> modelData, Color primaryOrange, Color primaryDark){
+    showDialog(
+      context: context,
+      builder: (BuildContext dialogContext){
+        return AlertDialog(
+          backgroundColor: Colors.white,
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const SizedBox(height: 24),
+              Text('How would you like\nto get this model?', textAlign: TextAlign.center, style: TextStyle(color: primaryOrange,
+              fontSize: 20, fontWeight: FontWeight.bold)),
+              const SizedBox(height: 32),
+              
+              //Download Model btn
+              SizedBox(
+                width: double.infinity,
+                child: OutlinedButton.icon(
+                  onPressed: () {
+                    Navigator.pop(dialogContext);
+                    Navigator.push(context, MaterialPageRoute(builder: (context) => PaymentPage(totalAmount: (modelData['price'] ?? 0).toDouble(),
+                    orderDetails: {
+                      'modelId' : modelData['id'] ?? '',
+                      'title' : modelData['title'] ?? '3D Model',
+                      'orderType' : 'download', 
+                      'fileUrl' : modelData['fileUrl'] ?? '',
+                      'designerDescription' : '',
+                    },
+                    )));
+                  },
+                  icon: Icon(Icons.file_download_outlined, color: primaryOrange,),
+                  label: Text('Download Model', style: TextStyle(color: primaryOrange, fontSize: 16),),
+                  style: OutlinedButton.styleFrom(
+                    side: BorderSide(color: primaryOrange, width: 1.5),
+                    padding: const EdgeInsets.symmetric(vertical: 12),
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30))
+                  ),
+                ),
+              ),
+              const SizedBox(height: 12),
+
+              SizedBox(
+                width: double.infinity,
+                child: ElevatedButton.icon(
+                  onPressed: (){
+                    Navigator.pop(dialogContext);
+                    Navigator.push(context, MaterialPageRoute(builder: (context) => FindStorePage(modelData: modelData)));
+                  },
+                  icon: const Icon(Icons.storefront_outlined, color: Colors.white,),
+                  label: const Text('Find Store to print', style: TextStyle(color: Colors.white, fontSize: 16),),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: primaryOrange,
+                    padding: const EdgeInsets.symmetric(vertical: 12),
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30))
+                  ),
+                ),
+              ),
+              const SizedBox(height: 16,),
+              
+              GestureDetector(
+                onTap: () => Navigator.pop(dialogContext),
+                child: Text('Cancel', style: TextStyle(color: Colors.grey.shade400, fontSize: 14),),
+              )
+            ],
+          ),
+        );
+      }
+    );
+  }
+
     Future<void> _downloadFile(BuildContext context, String? url) async{
     if(url == null || url.isEmpty){
       ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('No 3D file available for download')),
@@ -348,44 +420,17 @@ class ModelPreviewPage extends StatelessWidget {
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 20),
             decoration: BoxDecoration(color: bgColor),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                InkWell(
-                  onTap: () => _downloadFile(context, modelData['fileUrl']),
-                  child: Padding(padding: const EdgeInsets.all(8.0),
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Icon(Icons.file_download, color: primaryDark, size: 30),
-                      const SizedBox(height: 4,),
-                      Text('Download', style: TextStyle(color: primaryDark, fontSize: 13, fontWeight: FontWeight.bold),)
-                    ],
-                  ),),
+            child: SizedBox(
+              width: double.infinity,
+              height: 55,
+              child: ElevatedButton(
+                onPressed: ()=> _ShowOrderOptionsDialog(context, modelData, primaryOrange, primaryDark),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: primaryOrange,
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(25)),
+                  elevation: 0
                 ),
-                SizedBox(
-                  width: 180,
-                  height: 50,
-                  child: ElevatedButton(
-                    onPressed: () {
-                      // go to FindStorePage
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(builder: (context) => const FindStorePage()),
-                      );
-                    },
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: primaryOrange,
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(25)),
-                      elevation: 0,
-                    ),
-                    child: const Text(
-                      'Find Store',
-                      style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 18),
-                    ),
-                  ),
-                )
-              ],
+                child: const Text('Order Now', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 18),)),
             ),
           )
         ],
