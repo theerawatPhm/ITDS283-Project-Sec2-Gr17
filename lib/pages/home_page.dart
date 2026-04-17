@@ -171,7 +171,7 @@ Widget _buildHomeContent() {
                 Text('3D NOW', 
                 style: TextStyle(
                   fontSize: 28, 
-                  fontWeight: FontWeight.bold,
+                  fontWeight: FontWeight.w900,
                   color: primaryDark
                 ),
                 ),
