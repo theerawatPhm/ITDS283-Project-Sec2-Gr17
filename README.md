@@ -32,9 +32,10 @@ Frontend: Flutter (Dart) for cross-platform mobile development.
 Contributors
 
 6521004 Theerawat Phommaneewat
-Roles: Project Lead, UI/UX Design.
-Technical: Marketplace Module, Firebase Integration (Auth & Firestore), Google Maps API Implementation.
+Roles:      Project Lead, UI/UX Design.
+Technical:  Marketplace Module, Firebase Integration (Auth & Firestore),
+            Google Maps API Implementation.
 
-6521008 Proudrawee Suthakorn: UX/UI design, Prepare 3D data for Marketplace and Front-end developer.
+6521008 Proudrawee Suthakorn
 Roles: Front-end Developer, UI/UX Design.
 Technical: 3D Data Preparation for Marketplace, Screen Layout Implementation.
