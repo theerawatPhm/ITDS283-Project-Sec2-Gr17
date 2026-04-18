@@ -203,9 +203,7 @@ Widget _buildHomeContent() {
                 ),
               ),
             ),
-            // _buildSearchbar(),
             const SizedBox(height: 20),
-            // ProcessingBanner(orderCount: 1, progressPercent: 50),
             StreamBuilder<QuerySnapshot>(
               stream: FirebaseFirestore.instance
               .collection('app3dnow_order')
