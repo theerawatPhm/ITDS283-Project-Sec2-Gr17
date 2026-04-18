@@ -26,6 +26,8 @@ class _FindStorePageState extends State<FindStorePage> {
   String currentLocation = 'Fetching location...';
 
   List<Map<String , dynamic>> stores = [];
+  
+  final TextEditingController _locationController = TextEditingController();
 
   @override
   void initState(){
@@ -114,31 +116,7 @@ class _FindStorePageState extends State<FindStorePage> {
       }else{
         throw Exception('Failed to load places from Google');
       }
-      //   stores = [
-      //   {
-      //     'name' : 'Amika 3D Print',
-      //     'service' : 'Resin print',
-      //     'distance' : '0.5 km',
-      //     'location' : 'Pinklao',
-      //     'color' : Colors.blue.shade400,
-      //   },
-      //   {
-      //     'name': 'Boom Bim Print',
-      //     'service': 'General and Resin Print',
-      //     'distance': '0.5 km',
-      //     'location': 'Arun Amarin',
-      //     'color': Colors.teal.shade300,
-      //   },
-      //   {
-      //     'name': 'Sophi Kae',
-      //     'service': 'General Print',
-      //     'distance': '0.9 km',
-      //     'location': 'Bangkok Noi',
-      //     'color': Colors.orange.shade300,
-      //   },
-      //   ];
-      //   isLoading = false;
-      // });
+
     }catch (e){
       setState(() {
         currentLocation = 'Location Error';
@@ -148,6 +126,78 @@ class _FindStorePageState extends State<FindStorePage> {
     }
     await Future.delayed(const Duration(seconds: 2));
   }
+
+  Future <void> _searchCustomLocation(String address) async{
+    if(address.trim().isEmpty) return;
+    setState(() {
+      isLoading = true;
+    });
+
+    try{
+      List<Location> locations = await locationFromAddress(address);
+      if(address.isNotEmpty){
+        final double lat = locations.first.latitude;
+        final double lng = locations.first.longitude;
+
+        final String apiKey = dotenv.env['GOOGLE_MAPS_API_KEY'] ?? '';
+        final int radius = 5000;
+        final String keyword = '3d printing';
+
+        final String url = 'https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=$lat,$lng&radius=$radius&keyword=$keyword&key=$apiKey';
+
+        final response = await http.get(Uri.parse(url));
+
+        if(response.statusCode == 200){
+          final Map<String, dynamic> data = json.decode(response.body);
+          final List<dynamic> results = data['results'];
+
+          List<Map<String, dynamic>> realStores = [];
+
+          for (var placeData in results){
+            final double storeLat = placeData['geometry']['location']['lat'];
+            final double storeLng = placeData['geometry']['location']['lng'];
+            final double distanceInMeters = Geolocator.distanceBetween(lat, lng, storeLat, storeLng);
+            final String distanceInKm = (distanceInMeters / 1000).toStringAsFixed(1);
+
+            realStores.add({
+              'name' : placeData['name'] ?? 'Unknown Store',
+              'service' : '3D Print Service',
+              'distance' : '$distanceInKm km',
+              'location' : placeData['vicinity'] ?? 'Unknown Address',
+              'color' : Colors.blue.shade300
+            });
+          }
+          setState(() {
+            stores = realStores.isNotEmpty ? realStores : [
+              {
+                'name': 'No Stores Found in this area',
+                'service': 'Try expanding search radius',
+                'distance': '- km',
+                'location': 'N/A',
+                'color': Colors.grey.shade400,
+              }
+            ];
+            isLoading = false;
+          });
+        }else{
+          throw Exception('Failed to load places from Google');
+        }
+      }
+    }catch (e){
+      setState(() {
+        stores =[{
+            'name': 'Location not found',
+            'service': 'Please try another keyword',
+            'distance': '- km',
+            'location': 'N/A',
+            'color': Colors.red.shade300,
+          }
+        ];
+      });
+      print('Error searching location: $e');
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -177,17 +227,38 @@ class _FindStorePageState extends State<FindStorePage> {
           ),
           Padding(padding: const EdgeInsets.symmetric(horizontal: 24.0),
           child: Container(
-            padding: const EdgeInsets.only(left: 20, right: 20, top: 15, bottom: 15),
+            padding: const EdgeInsets.only(left: 20, right: 7, top: 4, bottom: 4),
             decoration: BoxDecoration(
               color: Colors.white,
               borderRadius: BorderRadius.circular(30),
               border: Border.all(color: primaryOrange, width: 1.5),
             ),
             child: Row(
-              mainAxisAlignment: MainAxisAlignment.center,
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Text(isLoading ? 'Locating' : currentLocation, style: TextStyle(color: primaryOrange, fontWeight: FontWeight.w600),
+                Expanded(
+                  child: TextField(
+                    controller: _locationController,
+                    style: TextStyle(color: primaryOrange, fontWeight: FontWeight.bold),
+                    decoration: InputDecoration(
+                      hintText: isLoading ? 'Locating...' : 'Search Location...',
+                      border: InputBorder.none,
+                      isDense: true,
+                    ),
+                    onSubmitted: (value) => _searchCustomLocation(value),
+                  )
                 ),
+                ElevatedButton(
+                  onPressed: (){
+                    FocusScope.of(context).unfocus();
+                    _searchCustomLocation(_locationController.text);
+                  },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: primaryOrange,
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
+                    elevation: 0
+                  ),
+                  child: const Text('Enter', style: TextStyle(color: Colors.white),))
               ],
             ),
           ),
