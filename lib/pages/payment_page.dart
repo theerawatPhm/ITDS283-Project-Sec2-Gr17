@@ -238,9 +238,9 @@ class SuccessPage extends StatelessWidget {
                 height: 250,
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
-                  color: Colors.blue.shade100, 
+                  color: primaryOrange.withOpacity(0.1),
                 ),
-                child: const Icon(Icons.person, size: 100, color: Colors.white), 
+                child: Icon(Icons.hourglass_bottom, size: 100, color: primaryOrange), 
               ),
               
               const SizedBox(height: 40),
