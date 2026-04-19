@@ -493,7 +493,7 @@ class StoreDetailPage extends StatelessWidget {
                 child: ElevatedButton(
                   onPressed: (){
                     Navigator.pop(dialogContext);
-                    Navigator.push(context, MaterialPageRoute(builder: (context) => const NewDesign()));
+                    Navigator.push(context, MaterialPageRoute(builder: (context) => NewDesign(selectedStore: StoreData)));
                 },
                 style: ElevatedButton.styleFrom(
                   backgroundColor: primaryOrange,

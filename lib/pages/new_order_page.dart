@@ -6,7 +6,8 @@ import 'find_store_page.dart';
 
 class NewDesign extends StatefulWidget {
   final VoidCallback? onBackToHome;
-  const NewDesign({super.key, this.onBackToHome});
+  final Map<String, dynamic>? selectedStore;
+  const NewDesign({super.key, this.onBackToHome, this.selectedStore});
 
   @override
   State<NewDesign> createState() => _NewDesignState();
@@ -112,19 +113,32 @@ class _NewDesignState extends State<NewDesign> {
                           return;
                       }
 
-                      Map<String, dynamic> customModelData = {
-                     'fileName': _selectedFileName!,
-                     'fileSize': _selectedFileSizes ?? 'Unknown Size',
-                     'material': _selectedMaterial,
-                     'quality': _selectedQuality,
-                     'scrub': _selectedScrub,
-                     'color': _SelectedColor,
-                     'requestFile': _selectedRequestFile,
-                     'otherText': _otherController.text.trim().isEmpty ? 'No' : _otherController.text.trim(),
-                   };
-
+                      if (widget.selectedStore != null) {
+                          Navigator.push(context, MaterialPageRoute(builder: (context) => ReviewOrderPage(
+                            fileName: _selectedFileName,
+                            fileSize: _selectedFileSizes,
+                            material: _selectedMaterial,
+                            quality: _selectedQuality,
+                            scrub: _selectedScrub,
+                            color: _SelectedColor,
+                            requestFile: _selectedRequestFile,
+                            otherText: _otherController.text.trim().isEmpty ? 'No' : _otherController.text.trim(),
+                            storeName: widget.selectedStore!['name']
+                          )));
+                        } else {
+                          Map<String, dynamic> customModelData = {
+                            'fileName': _selectedFileName!,
+                            'fileSize': _selectedFileSizes ?? 'Unknown Size',
+                            'material': _selectedMaterial,
+                            'quality': _selectedQuality,
+                            'scrub': _selectedScrub,
+                            'color': _SelectedColor,
+                            'requestFile': _selectedRequestFile,
+                            'otherText': _otherController.text.trim().isEmpty ? 'No' : _otherController.text.trim(),
+                          };
                    Navigator.push(context, MaterialPageRoute(builder: (context) => FindStorePage(modelData: customModelData,)));
-                    },
+                   }
+                  },
                     style: ElevatedButton.styleFrom(
                       backgroundColor: primaryOrange,
                       foregroundColor: Colors.white,
